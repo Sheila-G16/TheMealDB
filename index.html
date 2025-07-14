@@ -46,22 +46,26 @@
   <div id="result"></div>
 
   <script>
+     // Main function to search for a meal
     function searchMeal() {
       const mealName = document.getElementById('search').value;
       const resultDiv = document.getElementById('result');
       resultDiv.innerHTML = '';
 
+      // Show a message if input is empty
       if (mealName.trim() === '') {
         resultDiv.innerHTML = 'Please enter a meal name.';
         return;
       }
 
+       // Fetch data from TheMealDB API
       fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=' + mealName)
         .then(res => res.json())
         .then(data => {
           if (data.meals === null) {
             resultDiv.innerHTML = 'No meal found.';
           } else {
+            // Display each meal found
             data.meals.forEach(meal => {
               const mealDiv = document.createElement('div');
               mealDiv.className = 'meal';
