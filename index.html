@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>The Meal DB</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+
+    input {
+      padding: 8px;
+      width: 200px;
+    }
+
+    button {
+      padding: 8px 16px;
+    }
+
+    .meal {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-top: 20px;
+      display: inline-block;
+      width: 250px;
+    }
+
+    img {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Search Meals</h1>
+  <input type="text" id="search" placeholder="Enter meal name">
+  <button onclick="searchMeal()">Search</button>
+
+  <div id="result"></div>
+
+  <script>
+    function searchMeal() {
+      const mealName = document.getElementById('search').value;
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '';
+
+      if (mealName.trim() === '') {
+        resultDiv.innerHTML = 'Please enter a meal name.';
+        return;
+      }
+
+      fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=' + mealName)
+        .then(res => res.json())
+        .then(data => {
+          if (data.meals === null) {
+            resultDiv.innerHTML = 'No meal found.';
+          } else {
+            data.meals.forEach(meal => {
+              const mealDiv = document.createElement('div');
+              mealDiv.className = 'meal';
+              mealDiv.innerHTML = `
+                <h3>${meal.strMeal}</h3>
+                <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+                <p><a href="${meal.strYoutube}" target="_blank">Watch on YouTube</a></p>
+              `;
+              resultDiv.appendChild(mealDiv);
+            });
+          }
+        })
+        .catch(err => {
+          resultDiv.innerHTML = 'Error fetching meal.';
+          console.error(err);
+        });
+    }
+  </script>
+
+</body>
+</html>
