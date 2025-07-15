@@ -26,6 +26,12 @@
     } 
     //suggestion: adding hover styles for buttons would be helpful for better appearance when being clicked.
 
+    /* ✅ Hover effect for button */
+    button:hover {
+      background-color: #45a049;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
     .meal {
       border: 1px solid #ddd;
       padding: 10px;
@@ -33,6 +39,7 @@
       display: inline-block;
       width: 250px;
       background-color: white;
+      border-radius: 10px; /* ✅ Less sharp corners */
     }
     //suggestion: could make the meal cards' corner less sharper.
     
@@ -65,9 +72,10 @@
   <script>
     //There is no list of meals. A list in the Main Menu is helpful to make it easier to find meals. But they then made this project functional and does exactly what it's supposed to do.
     //it is excellent for effective web application
-// I suggest that all the youtube link be made available
-// because some are currently unavailable
-// and the others redirect back to the search meal page.
+    // I suggest that all the youtube link be made available
+    // because some are currently unavailable
+    // and the others redirect back to the search meal page.
+
     // Load categories, areas, and ingredients
     window.onload = function() {
       loadDropdown('https://www.themealdb.com/api/json/v1/1/list.php?c=list', 'categorySelect', 'strCategory');
@@ -102,10 +110,9 @@
         const mealDiv = document.createElement('div');
         mealDiv.className = 'meal';
         mealDiv.innerHTML = 
-          <h3>${meal.strMeal}</h3>
+          `<h3>${meal.strMeal}</h3>
           <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
-          <p><a href="${meal.strYoutube}" target="_blank">Watch on YouTube</a></p>
-        ;
+          <p><a href="${meal.strYoutube}" target="_blank">Watch on YouTube</a></p>`;
         resultDiv.appendChild(mealDiv);
       });
     }
@@ -129,7 +136,7 @@
     function filterByCategory() {
       const category = document.getElementById('categorySelect').value;
       if (!category) return;
-      fetch(https://www.themealdb.com/api/json/v1/1/filter.php?c=${category})
+      fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`)
         .then(res => res.json())
         .then(data => displayMeals(data.meals))
         .catch(err => console.error(err));
@@ -138,7 +145,7 @@
     function filterByArea() {
       const area = document.getElementById('areaSelect').value;
       if (!area) return;
-      fetch(https://www.themealdb.com/api/json/v1/1/filter.php?a=${area})
+      fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?a=${area}`)
         .then(res => res.json())
         .then(data => displayMeals(data.meals))
         .catch(err => console.error(err));
@@ -147,7 +154,7 @@
     function filterByIngredient() {
       const ingredient = document.getElementById('ingredientSelect').value;
       if (!ingredient) return;
-      fetch(https://www.themealdb.com/api/json/v1/1/filter.php?i=${ingredient})
+      fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${ingredient}`)
         .then(res => res.json())
         .then(data => displayMeals(data.meals))
         .catch(err => console.error(err));
@@ -155,4 +162,4 @@
   </script>
 
 </body>
-</html> 
+</html>
