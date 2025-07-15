@@ -8,23 +8,27 @@
       padding: 20px;
       text-align: center;
       background-color: #f5f5f5;
-    } 
-    //Minimalist colors and being simple makes the style more appealing. Nice work on this one!
+    }
 
     input, select {
       padding: 8px;
       width: 200px;
       margin: 5px;
     }
-    
+
     button {
       padding: 8px 16px;
       background-color: #4CAF50;
       border: none;
       color: white;
       cursor: pointer;
-    } 
-    //suggestion: adding hover styles for buttons would be helpful for better appearance when being clicked.
+    }
+
+    /* ✅ Hover style for buttons */
+    button:hover {
+      background-color: #45a049;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
 
     .meal {
       border: 1px solid #ddd;
@@ -33,9 +37,11 @@
       display: inline-block;
       width: 250px;
       background-color: white;
+
+      /* ✅ Rounded corners */
+      border-radius: 10px;
     }
-    //suggestion: could make the meal cards' corner less sharper.
-    
+
     img {
       width: 100%;
     }
@@ -63,16 +69,15 @@
   <div id="result"></div>
 
   <script>
-    //There is no list of meals. A list in the Main Menu is helpful to make it easier to find meals. But they then made this project functional and does exactly what it's supposed to do.
-    //it is excellent for effective web application
-// I suggest that all the youtube link be made available
-// because some are currently unavailable
-// and the others redirect back to the search meal page.
-    // Load categories, areas, and ingredients
     window.onload = function() {
       loadDropdown('https://www.themealdb.com/api/json/v1/1/list.php?c=list', 'categorySelect', 'strCategory');
       loadDropdown('https://www.themealdb.com/api/json/v1/1/list.php?a=list', 'areaSelect', 'strArea');
       loadDropdown('https://www.themealdb.com/api/json/v1/1/list.php?i=list', 'ingredientSelect', 'strIngredient');
+
+      // Optional: Load default meals
+      fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=')
+        .then(res => res.json())
+        .then(data => displayMeals(data.meals));
     };
 
     function loadDropdown(url, selectId, key) {
@@ -101,11 +106,11 @@
       meals.forEach(meal => {
         const mealDiv = document.createElement('div');
         mealDiv.className = 'meal';
-        mealDiv.innerHTML = 
+        mealDiv.innerHTML = `
           <h3>${meal.strMeal}</h3>
           <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
-          <p><a href="${meal.strYoutube}" target="_blank">Watch on YouTube</a></p>
-        ;
+          <p>${meal.strYoutube ? `<a href="${meal.strYoutube}" target="_blank">Watch on YouTube</a>` : 'No video available'}</p>
+        `;
         resultDiv.appendChild(mealDiv);
       });
     }
@@ -129,7 +134,7 @@
     function filterByCategory() {
       const category = document.getElementById('categorySelect').value;
       if (!category) return;
-      fetch(https://www.themealdb.com/api/json/v1/1/filter.php?c=${category})
+      fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`)
         .then(res => res.json())
         .then(data => displayMeals(data.meals))
         .catch(err => console.error(err));
@@ -138,7 +143,7 @@
     function filterByArea() {
       const area = document.getElementById('areaSelect').value;
       if (!area) return;
-      fetch(https://www.themealdb.com/api/json/v1/1/filter.php?a=${area})
+      fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?a=${area}`)
         .then(res => res.json())
         .then(data => displayMeals(data.meals))
         .catch(err => console.error(err));
@@ -147,7 +152,7 @@
     function filterByIngredient() {
       const ingredient = document.getElementById('ingredientSelect').value;
       if (!ingredient) return;
-      fetch(https://www.themealdb.com/api/json/v1/1/filter.php?i=${ingredient})
+      fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${ingredient}`)
         .then(res => res.json())
         .then(data => displayMeals(data.meals))
         .catch(err => console.error(err));
@@ -155,4 +160,4 @@
   </script>
 
 </body>
-</html> 
+</html>
