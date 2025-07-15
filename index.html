@@ -3,39 +3,40 @@
 <head>
   <title>The Meal DB</title>
   <style>
-  body {
-    font-family: sans-serif;
-    padding: 20px;
-    text-align: center;
-    background-color: #f5f5f5;
-  }
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      text-align: center;
+      background-color: #f5f5f5;
+    }
 
-  input {
-    padding: 8px;
-    width: 200px;
-  }
+    input, select {
+      padding: 8px;
+      width: 200px;
+      margin: 5px;
+    }
 
-  button {
-    padding: 8px 16px;
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    cursor: pointer;
-  }
+    button {
+      padding: 8px 16px;
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
 
-  .meal {
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin-top: 20px;
-    display: inline-block;
-    width: 250px;
-  }
+    .meal {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-top: 20px;
+      display: inline-block;
+      width: 250px;
+      background-color: white;
+    }
 
-  img {
-    width: 100%;
-  }
-</style>
-
+    img {
+      width: 100%;
+    }
+  </style>
 </head>
 <body>
 
@@ -43,45 +44,105 @@
   <input type="text" id="search" placeholder="Enter meal name">
   <button onclick="searchMeal()">Search</button>
 
+  <h2>Or Browse by:</h2>
+  <select id="categorySelect" onchange="filterByCategory()">
+    <option value="">Select Category</option>
+  </select>
+
+  <select id="areaSelect" onchange="filterByArea()">
+    <option value="">Select Area</option>
+  </select>
+
+  <select id="ingredientSelect" onchange="filterByIngredient()">
+    <option value="">Select Ingredient</option>
+  </select>
+
   <div id="result"></div>
 
   <script>
-     // Main function to search for a meal
-    function searchMeal() {
-      const mealName = document.getElementById('search').value;
+    // Load categories, areas, and ingredients
+    window.onload = function() {
+      loadDropdown('https://www.themealdb.com/api/json/v1/1/list.php?c=list', 'categorySelect', 'strCategory');
+      loadDropdown('https://www.themealdb.com/api/json/v1/1/list.php?a=list', 'areaSelect', 'strArea');
+      loadDropdown('https://www.themealdb.com/api/json/v1/1/list.php?i=list', 'ingredientSelect', 'strIngredient');
+    };
+
+    function loadDropdown(url, selectId, key) {
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          const select = document.getElementById(selectId);
+          const items = data.meals || [];
+          items.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item[key];
+            option.textContent = item[key];
+            select.appendChild(option);
+          });
+        });
+    }
+
+    function displayMeals(meals) {
       const resultDiv = document.getElementById('result');
       resultDiv.innerHTML = '';
-
-      // Show a message if input is empty
-      if (mealName.trim() === '') {
-        resultDiv.innerHTML = 'Please enter a meal name.';
+      if (!meals || meals.length === 0) {
+        resultDiv.innerHTML = 'No meals found.';
         return;
       }
 
-       // Fetch data from TheMealDB API
+      meals.forEach(meal => {
+        const mealDiv = document.createElement('div');
+        mealDiv.className = 'meal';
+        mealDiv.innerHTML = `
+          <h3>${meal.strMeal}</h3>
+          <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+          <p><a href="${meal.strYoutube}" target="_blank">Watch on YouTube</a></p>
+        `;
+        resultDiv.appendChild(mealDiv);
+      });
+    }
+
+    function searchMeal() {
+      const mealName = document.getElementById('search').value.trim();
+      if (mealName === '') {
+        document.getElementById('result').innerHTML = 'Please enter a meal name.';
+        return;
+      }
+
       fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=' + mealName)
         .then(res => res.json())
-        .then(data => {
-          if (data.meals === null) {
-            resultDiv.innerHTML = 'No meal found.';
-          } else {
-            // Display each meal found
-            data.meals.forEach(meal => {
-              const mealDiv = document.createElement('div');
-              mealDiv.className = 'meal';
-              mealDiv.innerHTML = `
-                <h3>${meal.strMeal}</h3>
-                <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
-                <p><a href="${meal.strYoutube}" target="_blank">Watch on YouTube</a></p>
-              `;
-              resultDiv.appendChild(mealDiv);
-            });
-          }
-        })
+        .then(data => displayMeals(data.meals))
         .catch(err => {
-          resultDiv.innerHTML = 'Error fetching meal.';
+          document.getElementById('result').innerHTML = 'Error fetching meal.';
           console.error(err);
         });
+    }
+
+    function filterByCategory() {
+      const category = document.getElementById('categorySelect').value;
+      if (!category) return;
+      fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`)
+        .then(res => res.json())
+        .then(data => displayMeals(data.meals))
+        .catch(err => console.error(err));
+    }
+
+    function filterByArea() {
+      const area = document.getElementById('areaSelect').value;
+      if (!area) return;
+      fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?a=${area}`)
+        .then(res => res.json())
+        .then(data => displayMeals(data.meals))
+        .catch(err => console.error(err));
+    }
+
+    function filterByIngredient() {
+      const ingredient = document.getElementById('ingredientSelect').value;
+      if (!ingredient) return;
+      fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${ingredient}`)
+        .then(res => res.json())
+        .then(data => displayMeals(data.meals))
+        .catch(err => console.error(err));
     }
   </script>
 
